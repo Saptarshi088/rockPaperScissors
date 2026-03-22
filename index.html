@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rock Paper Scissors</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         --bg: #0e0e10;
@@ -19,7 +22,24 @@
         --tie: #ffd166;
       }
 
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body.light-theme {
+        --bg: #f5f5f7;
+        --surface: #ffffff;
+        --border: #e5e5e7;
+        --accent: #0071e3;
+        --accent-dim: rgba(0, 113, 227, 0.1);
+        --text: #1d1d1f;
+        --muted: #86868b;
+        --win: #34c759;
+        --lose: #ff3b30;
+        --tie: #ff9500;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
       body {
         display: flex;
@@ -28,22 +48,36 @@
         justify-content: center;
         min-height: 100vh;
         background-color: var(--bg);
-        font-family: 'DM Mono', monospace;
+        font-family: "DM Mono", monospace;
         background-image:
-          linear-gradient(rgba(0,245,196,0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,245,196,0.03) 1px, transparent 1px);
+          linear-gradient(rgba(0, 245, 196, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 245, 196, 0.03) 1px, transparent 1px);
         background-size: 40px 40px;
+        transition:
+          background-color 0.3s ease,
+          color 0.3s ease;
+        padding: 20px;
+      }
+
+      body.light-theme {
+        background-image:
+          linear-gradient(rgba(0, 113, 227, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 113, 227, 0.05) 1px, transparent 1px);
       }
 
       h1 {
-        font-family: 'Bebas Neue', sans-serif;
+        font-family: "Bebas Neue", sans-serif;
         font-size: clamp(2.5rem, 6vw, 4.5rem);
         letter-spacing: 0.12em;
         color: var(--text);
         margin-bottom: 8px;
+        transition: color 0.3s ease;
       }
 
-      h1 span { color: var(--accent); }
+      h1 span {
+        color: var(--accent);
+        transition: color 0.3s ease;
+      }
 
       .subtitle {
         font-size: 0.7rem;
@@ -51,6 +85,45 @@
         text-transform: uppercase;
         color: var(--muted);
         margin-bottom: 48px;
+        transition: color 0.3s ease;
+      }
+
+      .theme-toggle-container {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+
+      .js-theme-button {
+        background: var(--surface);
+        color: var(--text);
+        border: 2px solid var(--border);
+        border-radius: 25px;
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .js-theme-button:hover {
+        border-color: var(--accent);
+        box-shadow: 0 0 15px var(--accent-dim);
+        transform: translateY(-2px);
+      }
+
+      .js-theme-button:active {
+        transform: translateY(0);
+      }
+
+      .theme-icon {
+        font-size: 1rem;
       }
 
       .btn-row {
@@ -67,26 +140,37 @@
         background: var(--surface);
         font-size: 2.8rem;
         cursor: pointer;
-        transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        transition:
+          transform 0.15s ease,
+          border-color 0.15s ease,
+          box-shadow 0.15s ease,
+          background-color 0.3s ease;
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .choice-btn:hover {
-        transform: translateY(-6px) scale(1.08);
+        transform: translateY(-8px) scale(1.1);
         border-color: var(--accent);
-        box-shadow: 0 0 28px rgba(0, 245, 196, 0.3);
+        box-shadow:
+          0 8px 24px var(--accent-dim),
+          0 0 20px var(--accent-dim);
+        background: var(--accent-dim);
       }
 
       .choice-btn:active {
-        transform: translateY(0) scale(0.96);
+        transform: translateY(-2px) scale(0.98);
       }
 
       .arena {
         display: flex;
         align-items: center;
         gap: 32px;
-        margin-bottom: 28px;
+        margin-bottom: 40px;
         min-height: 90px;
+        margin-top: 20px;
       }
 
       .arena-emoji {
@@ -94,6 +178,7 @@
         width: 80px;
         text-align: center;
         transition: all 0.3s ease;
+        filter: drop-shadow(0 4px 12px var(--accent-dim));
       }
 
       .arena-label {
@@ -103,109 +188,213 @@
         color: var(--muted);
         text-align: center;
         margin-top: 4px;
+        transition: color 0.3s ease;
       }
 
       .vs-badge {
-        font-family: 'Bebas Neue', sans-serif;
+        font-family: "Bebas Neue", sans-serif;
         font-size: 1.4rem;
         letter-spacing: 0.15em;
-        color: var(--border);
-        padding: 6px 14px;
+        color: var(--accent);
+        padding: 8px 16px;
         border: 2px solid var(--border);
-        border-radius: 6px;
+        border-radius: 8px;
+        background: var(--surface);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        font-weight: 700;
       }
 
       #js-result {
-        font-family: 'Bebas Neue', sans-serif;
+        font-family: "Bebas Neue", sans-serif;
         font-size: clamp(1.6rem, 4vw, 2.4rem);
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        height: 44px;
+        height: 50px;
         transition: color 0.2s ease;
         color: var(--text);
+        margin-bottom: 20px;
       }
 
-      #js-result.win  { color: var(--win); }
-      #js-result.lose { color: var(--lose); }
-      #js-result.tie  { color: var(--tie); }
+      #js-result.win {
+        color: var(--win);
+        text-shadow: 0 0 10px var(--win);
+      }
+
+      #js-result.lose {
+        color: var(--lose);
+        text-shadow: 0 0 10px var(--lose);
+      }
+
+      #js-result.tie {
+        color: var(--tie);
+        text-shadow: 0 0 10px var(--tie);
+      }
 
       #js-score {
         display: flex;
         gap: 0;
-        margin-top: 40px;
-        border: 1px solid var(--border);
+        margin-top: 20px;
+        border: 2px solid var(--border);
         border-radius: 12px;
         overflow: hidden;
         background: var(--surface);
+        box-shadow: 0 4px 12px var(--accent-dim);
+        transition: all 0.3s ease;
       }
 
       .score-cell {
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 16px 32px;
-        gap: 6px;
-        border-right: 1px solid var(--border);
+        padding: 20px 32px;
+        gap: 8px;
+        border-right: 2px solid var(--border);
+        flex: 1;
+        transition: all 0.3s ease;
       }
 
-      .score-cell:last-child { border-right: none; }
+      .score-cell:last-child {
+        border-right: none;
+      }
 
       .score-label {
         font-size: 0.6rem;
         letter-spacing: 0.25em;
         text-transform: uppercase;
         color: var(--muted);
+        transition: color 0.3s ease;
       }
 
       .score-num {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 2rem;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 2.2rem;
         letter-spacing: 0.05em;
         line-height: 1;
+        transition: all 0.3s ease;
       }
 
-      .score-cell.win-cell  .score-num { color: var(--win); }
-      .score-cell.lose-cell .score-num { color: var(--lose); }
-      .score-cell.tie-cell  .score-num { color: var(--tie); }
+      .score-cell.win-cell .score-num {
+        color: var(--win);
+      }
+
+      .score-cell.lose-cell .score-num {
+        color: var(--lose);
+      }
+
+      .score-cell.tie-cell .score-num {
+        color: var(--tie);
+      }
 
       #js-reset {
         margin-top: 20px;
         background: none;
-        border: 1px solid var(--border);
-        color: var(--muted);
-        font-family: 'DM Mono', monospace;
+        border: 2px solid var(--border);
+        color: var(--text);
+        font-family: "DM Mono", monospace;
         font-size: 0.65rem;
         letter-spacing: 0.2em;
         text-transform: uppercase;
-        padding: 8px 20px;
-        border-radius: 6px;
+        padding: 10px 24px;
+        border-radius: 8px;
         cursor: pointer;
-        transition: border-color 0.15s, color 0.15s;
+        transition: all 0.3s ease;
+        font-weight: 500;
       }
 
       #js-reset:hover {
         border-color: var(--lose);
         color: var(--lose);
+        box-shadow: 0 0 12px rgba(255, 77, 109, 0.3);
+        transform: translateY(-2px);
+      }
+
+      #js-reset:active {
+        transform: translateY(0);
       }
 
       @keyframes pop {
-        0%   { transform: scale(0.85); opacity: 0; }
-        60%  { transform: scale(1.06); }
-        100% { transform: scale(1);   opacity: 1; }
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+
+        50% {
+          transform: scale(1.08);
+        }
+
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
 
-      .pop { animation: pop 0.25s ease forwards; }
+      @keyframes glow {
+        0%,
+        100% {
+          filter: drop-shadow(0 0 0 var(--accent));
+        }
+        50% {
+          filter: drop-shadow(0 0 8px var(--accent-dim));
+        }
+      }
+
+      .pop {
+        animation: pop 0.1s cubic-bezier(0.68, -0.55, 0.265, 1.55) alternate;
+      }
+
+      .pop.win {
+        animation:
+          pop 0.1s cubic-bezier(0.68, -0.55, 0.265, 1.55) alternate,
+          glow 0.3s ease;
+      }
+
+      @media (max-width: 600px) {
+        .btn-row {
+          gap: 16px;
+        }
+
+        .choice-btn {
+          width: 90px;
+          height: 90px;
+          font-size: 2.2rem;
+        }
+
+        .arena {
+          gap: 16px;
+        }
+
+        .arena-emoji {
+          font-size: 2.5rem;
+          width: 60px;
+        }
+
+        .js-theme-button {
+          padding: 8px 16px;
+          font-size: 0.6rem;
+        }
+      }
     </style>
   </head>
 
   <body>
+    <div class="theme-toggle-container">
+      <button class="js-theme-button">
+        <span class="theme-icon" id="theme-icon">🌙</span>
+        <span id="theme-text">Light</span>
+      </button>
+    </div>
+
     <h1>Rock <span>&</span> Roll</h1>
     <p class="subtitle">Choose your weapon</p>
-
     <div class="btn-row">
-      <button class="choice-btn" onclick="play('rock')"    title="Rock">✊</button>
-      <button class="choice-btn" onclick="play('paper')"   title="Paper">✋</button>
-      <button class="choice-btn" onclick="play('scissor')" title="Scissors">✌️</button>
+      <button class="choice-btn" onclick="play('rock')" title="Rock">✊</button>
+      <button class="choice-btn" onclick="play('paper')" title="Paper">
+        ✋
+      </button>
+      <button class="choice-btn" onclick="play('scissor')" title="Scissors">
+        ✌️
+      </button>
     </div>
 
     <div class="arena">
@@ -240,37 +429,80 @@
     <button id="js-reset" onclick="resetScore()">↺ Reset Score</button>
 
     <script>
-      const score = JSON.parse(localStorage.getItem("rps-score")) || { win: 0, lose: 0, tie: 0 };
+      // Theme initialization
+      const themeSaved = localStorage.getItem("rps-theme") || "dark";
+      const themeButton = document.querySelector(".js-theme-button");
+      const themeIcon = document.getElementById("theme-icon");
+      const themeText = document.getElementById("theme-text");
+
+      function initializeTheme() {
+        if (themeSaved === "light") {
+          document.body.classList.add("light-theme");
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "Dark";
+        } else {
+          document.body.classList.remove("light-theme");
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "Light";
+        }
+      }
+
+      themeButton.addEventListener("click", () => {
+        const isLightTheme = document.body.classList.toggle("light-theme");
+        const newTheme = isLightTheme ? "light" : "dark";
+        localStorage.setItem("rps-theme", newTheme);
+
+        if (isLightTheme) {
+          themeIcon.textContent = "☀️";
+          themeText.textContent = "Dark";
+        } else {
+          themeIcon.textContent = "🌙";
+          themeText.textContent = "Light";
+        }
+      });
+
+      // Game logic
+      const score = JSON.parse(localStorage.getItem("rps-score")) || {
+        win: 0,
+        lose: 0,
+        tie: 0,
+      };
 
       const CHOICES = ["rock", "paper", "scissor"];
-      const EMOJI   = { rock: "✊", paper: "✋", scissor: "✌️" };
-      const BEATS   = { rock: "scissor", paper: "rock", scissor: "paper" };
+      const EMOJI = { rock: "✊", paper: "✋", scissor: "✌️" };
+      const BEATS = { rock: "scissor", paper: "rock", scissor: "paper" };
 
-      const resultEl    = document.getElementById("js-result");
+      const resultEl = document.getElementById("js-result");
       const arenaPlayer = document.getElementById("arena-player");
-      const arenaCpu    = document.getElementById("arena-cpu");
-      const winEl       = document.getElementById("js-win-num");
-      const loseEl      = document.getElementById("js-lose-num");
-      const tieEl       = document.getElementById("js-tie-num");
+      const arenaCpu = document.getElementById("arena-cpu");
+      const winEl = document.getElementById("js-win-num");
+      const loseEl = document.getElementById("js-lose-num");
+      const tieEl = document.getElementById("js-tie-num");
 
+      // Initialize theme and score
+      initializeTheme();
       updateScoreDisplay();
 
       function play(player) {
         const cpu = CHOICES[Math.floor(Math.random() * 3)];
 
         arenaPlayer.textContent = EMOJI[player];
-        arenaCpu.textContent    = EMOJI[cpu];
+        arenaCpu.textContent = EMOJI[cpu];
 
         let outcome;
-        if (player === cpu)           outcome = "tie";
+        if (player === cpu) outcome = "tie";
         else if (BEATS[player] === cpu) outcome = "win";
-        else                           outcome = "lose";
+        else outcome = "lose";
 
         score[outcome]++;
         localStorage.setItem("rps-score", JSON.stringify(score));
         updateScoreDisplay();
 
-        const labels = { win: "— you win!", lose: "— you lose!", tie: "— it's a tie!" };
+        const labels = {
+          win: "— you win!",
+          lose: "— you lose!",
+          tie: "— it's a tie!",
+        };
         resultEl.className = "";
         void resultEl.offsetWidth;
         resultEl.textContent = `${EMOJI[player]} vs ${EMOJI[cpu]}  ${labels[outcome]}`;
@@ -278,9 +510,9 @@
       }
 
       function updateScoreDisplay() {
-        winEl.textContent  = score.win;
+        winEl.textContent = score.win;
         loseEl.textContent = score.lose;
-        tieEl.textContent  = score.tie;
+        tieEl.textContent = score.tie;
       }
 
       function resetScore() {
@@ -288,9 +520,9 @@
         localStorage.setItem("rps-score", JSON.stringify(score));
         updateScoreDisplay();
         resultEl.textContent = "";
-        resultEl.className   = "";
+        resultEl.className = "";
         arenaPlayer.textContent = "❓";
-        arenaCpu.textContent    = "❓";
+        arenaCpu.textContent = "❓";
       }
     </script>
   </body>
