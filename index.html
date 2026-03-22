@@ -379,7 +379,12 @@
 
   <body>
     <div class="theme-toggle-container">
-      <button class="js-theme-button">
+      <button
+        class="js-theme-button"
+        id="theme-button"
+        aria-pressed="false"
+        title="Toggle theme (Enter)"
+      >
         <span class="theme-icon" id="theme-icon">🌙</span>
         <span id="theme-text">Light</span>
       </button>
@@ -429,9 +434,8 @@
     <button id="js-reset" onclick="resetScore()">↺ Reset Score</button>
 
     <script>
-      // Theme initialization
       const themeSaved = localStorage.getItem("rps-theme") || "dark";
-      const themeButton = document.querySelector(".js-theme-button");
+      const themeButton = document.getElementById("theme-button");
       const themeIcon = document.getElementById("theme-icon");
       const themeText = document.getElementById("theme-text");
 
@@ -440,14 +444,16 @@
           document.body.classList.add("light-theme");
           themeIcon.textContent = "☀️";
           themeText.textContent = "Dark";
+          themeButton.setAttribute("aria-pressed", "true");
         } else {
           document.body.classList.remove("light-theme");
           themeIcon.textContent = "🌙";
           themeText.textContent = "Light";
+          themeButton.setAttribute("aria-pressed", "false");
         }
       }
 
-      themeButton.addEventListener("click", () => {
+      themeButton.addEventListener("click", (e) => {
         const isLightTheme = document.body.classList.toggle("light-theme");
         const newTheme = isLightTheme ? "light" : "dark";
         localStorage.setItem("rps-theme", newTheme);
@@ -455,13 +461,36 @@
         if (isLightTheme) {
           themeIcon.textContent = "☀️";
           themeText.textContent = "Dark";
+          themeButton.setAttribute("aria-pressed", "true");
         } else {
           themeIcon.textContent = "🌙";
           themeText.textContent = "Light";
+          themeButton.setAttribute("aria-pressed", "false");
         }
       });
 
-      // Game logic
+      themeButton.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          themeButton.click();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        const active = document.activeElement;
+        const typing =
+          active &&
+          (active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.isContentEditable);
+        if (!typing) {
+          // avoid double-trigger if button itself is focused
+          if (active === themeButton) return;
+          themeButton.click();
+        }
+      });
+
       const score = JSON.parse(localStorage.getItem("rps-score")) || {
         win: 0,
         lose: 0,
@@ -479,7 +508,6 @@
       const loseEl = document.getElementById("js-lose-num");
       const tieEl = document.getElementById("js-tie-num");
 
-      // Initialize theme and score
       initializeTheme();
       updateScoreDisplay();
 
